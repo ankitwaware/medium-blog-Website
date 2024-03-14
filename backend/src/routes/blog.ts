@@ -33,11 +33,11 @@ blog.use("*", async (c, next) => {
     return c.json({ error: "unauthorized" });
   }
 
-  c.set("userId", payload.id);
+  c.set("userId", payload.userId);
   await next();
 });
 
-blog.get("/bulk", async (c) => {
+blog.get("/all", async (c) => {
   try {
     const prisma = new PrismaClient({
       datasourceUrl: c.env?.DATABASE_URL,
@@ -86,7 +86,9 @@ blog.post("/", async (c) => {
       },
     });
 
+    c.status(201);
     return c.json({
+      message: "sucessfully created blog",
       id: newPost.id,
     });
   } catch (error) {
@@ -113,7 +115,7 @@ blog.put("/", async (c) => {
       return c.json({ message: "invalid id or title or content" });
     }
 
-    await prisma.post.update({
+    const updatePost = await prisma.post.update({
       where: {
         id: body.id,
         authorId: userId,
@@ -124,7 +126,11 @@ blog.put("/", async (c) => {
       },
     });
 
-    return c.text("Updated post");
+    c.status(201);
+    return c.json({
+      message: "sucessfully updated blog",
+      id: updatePost.id,
+    });
   } catch (error) {
     console.log(error);
     c.status(403);

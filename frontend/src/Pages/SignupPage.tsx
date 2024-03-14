@@ -1,20 +1,32 @@
-import { ActionFunctionArgs, Form, Link } from "react-router-dom";
+import {
+  ActionFunctionArgs,
+  Form,
+  Link,
+  redirect,
+  useActionData,
+} from "react-router-dom";
 import Quote from "../components/Quote";
 import FormInput from "../components/UI/FormInput";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
+import { signupInput } from "@ankit_waware/commen";
+import { axiosInstance } from "../config";
+import axios, { AxiosError, ResponseType } from "axios";
 export default function SignupPage() {
-  const [input, setInput] = useState({
-    name: "",
+  const [input, setInput] = useState<signupInput>({
+    username: "",
     email: "",
     password: "",
   });
+  const actionData = useActionData();
 
-  function onchangeHandler(e) {
-    const name = e.target.name;
+  
+
+  function onchangeHandler(event: ChangeEvent<HTMLInputElement>) {
+    const name = event.target.name;
     setInput((prev) => {
       return {
         ...prev,
-        [name]: e.target.value,
+        [name]: event.target.value,
       };
     });
   }
@@ -33,12 +45,15 @@ export default function SignupPage() {
 
           <Form action="/signup" method="post">
             <FormInput
-              id="name"
+              id="username"
               type="text"
               label="Username"
-              value={input.name}
+              value={input.username}
               onChange={onchangeHandler}
               placeholder="Enter your username"
+              errorMsg={
+                actionData?.errors?.username && actionData.errors.username[0]
+              }
             />
             <FormInput
               id="email"
@@ -71,16 +86,43 @@ export default function SignupPage() {
 }
 
 async function action({ request }: ActionFunctionArgs) {
-  const SignupInputs = await request.formData();
+  try {
+    const fromData = await request.formData();
 
-  const userInputs = {
-    name: SignupInputs.get("name"),
-    email: SignupInputs.get("email"),
-    password: SignupInputs.get("password"),
-  };
-  console.log(userInputs);
+    const userInputs = {
+      username: fromData.get("username"),
+      email: fromData.get("email"),
+      password: fromData.get("password"),
+    };
 
-  return true;
+    const response = await axiosInstance.post(
+      "user/signup",
+      {
+        ...userInputs,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log(response);
+
+    if (response.status === 200) {
+      localStorage.removeItem("authToken");
+      localStorage.setItem("authToken", response.data.token);
+      return redirect("/blogs");
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      // Access to config, request, and response
+      return err.response?.data;
+    } else {
+      // Just a stock error
+      alert(err);
+    }
+  }
 }
 
 SignupPage.action = action;

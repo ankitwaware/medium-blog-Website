@@ -21,6 +21,10 @@ const BrowserRouter = createBrowserRouter([
         action: SigninPage.action,
         element: <SigninPage />,
       },
+      {
+        path: "/blogs",
+        element: <div>Blogs Page new</div>,
+      },
     ],
   },
 ]);

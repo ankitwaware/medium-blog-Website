@@ -1,8 +1,16 @@
-import { ActionFunctionArgs, Form, Link } from "react-router-dom";
+import {
+  ActionFunctionArgs,
+  Form,
+  Link,
+  redirect,
+  useActionData,
+} from "react-router-dom";
 import Quote from "../components/Quote";
 import FormInput from "../components/UI/FormInput";
 import { signinInput } from "@ankit_waware/commen";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
+import { axiosInstance } from "../config";
+import axios, { Axios, AxiosError } from "axios";
 
 export default function SigninPage() {
   const [input, setInput] = useState<signinInput>({
@@ -10,12 +18,18 @@ export default function SigninPage() {
     password: "",
   });
 
-  function onchangeHandler(e) {
-    const name = e.target.name;
+  const actionData = useActionData();
+
+  if (actionData) {
+    console.log(actionData);
+  }
+
+  function onchangeHandler(event: ChangeEvent<HTMLInputElement>) {
+    const name = event.target.name;
     setInput((prev) => {
       return {
         ...prev,
-        [name]: e.target.value,
+        [name]: event.target.value,
       };
     });
   }
@@ -64,15 +78,44 @@ export default function SigninPage() {
 }
 
 async function action({ request }: ActionFunctionArgs) {
-  const SigninInputs = await request.formData();
+  try {
+    const fromData = await request.formData();
 
-  const userInputs = {
-    email: SigninInputs.get("email"),
-    password: SigninInputs.get("password"),
-  };
-  console.log(userInputs);
+    const userInputs = {
+      email: fromData.get("email"),
+      password: fromData.get("password"),
+    };
 
-  return true;
+    const response = await axiosInstance.post(
+      "user/signin",
+      {
+        ...userInputs,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log(response.data);
+
+    if (response.status === 200) {
+      localStorage.removeItem("authToken");
+      localStorage.setItem("authToken", response.data.token);
+      return redirect("/blogs");
+    }
+
+    return response.data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      // Access to config, request, and response
+      return err.response?.data;
+    } else {
+      // Just a stock error
+      alert(err);
+    }
+  }
 }
 
 SigninPage.action = action;

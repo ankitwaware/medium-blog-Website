@@ -1,3 +1,5 @@
+import InputError from "./InputError";
+
 interface FormInput {
   id: string;
   label: string;
@@ -5,7 +7,8 @@ interface FormInput {
   placeholder?: string;
   value: string;
   className?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  errorMsg?: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function FormInput({
@@ -15,11 +18,16 @@ export default function FormInput({
   placeholder,
   value,
   onChange,
+  errorMsg,
 }: FormInput) {
   return (
     <div className="flex flex-col text-start gap-y-3 mb-6">
-      <label htmlFor={id} className="font-semibold leading-none">
+      <label
+        htmlFor={id}
+        className="font-semibold leading-none flex justify-between"
+      >
         {label}
+        {errorMsg && <InputError message={errorMsg} />}
       </label>
       <input
         type={type}

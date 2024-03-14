@@ -18,12 +18,11 @@ userRouter.post("/signup", async (c) => {
     }).$extends(withAccelerate());
 
     const body = await c.req.json();
-
     const result = SignupInput.safeParse(body);
 
     if (!result.success) {
       c.status(403);
-      return c.json({ error: "invalid Inputs" });
+      return c.json({ errors: result.error });
     }
 
     const user = await prisma.user.findFirst({
@@ -34,7 +33,9 @@ userRouter.post("/signup", async (c) => {
 
     if (user) {
       c.status(406);
-      return c.json({ message: "email Already exist" });
+      return c.json({
+        errors: { message: "Email Already Exist." },
+      });
     }
 
     const newUser = await prisma.user.create({
@@ -55,8 +56,8 @@ userRouter.post("/signup", async (c) => {
     return c.json({ token });
   } catch (error) {
     console.log(error);
-    c.status(403);
-    return c.json({ error: "error while signing up" });
+    c.status(500);
+    return c.json({ errors: { message: "error while signing up" } });
   }
 });
 
@@ -67,12 +68,11 @@ userRouter.post("/signin", async (c) => {
     }).$extends(withAccelerate());
 
     const body = await c.req.json();
-
     const result = SigninInput.safeParse(body);
 
     if (!result.success) {
       c.status(403);
-      return c.json({ error: "invalid Inputs" });
+      return c.json({ errors: result.error });
     }
 
     const user = await prisma.user.findFirst({
@@ -84,7 +84,9 @@ userRouter.post("/signin", async (c) => {
 
     if (!user) {
       c.status(403);
-      return c.json({ error: "user not found" });
+      return c.json({
+        errors: { message: "Invalid Email and Password" },
+      });
     }
 
     const token = await sign(
@@ -100,7 +102,7 @@ userRouter.post("/signin", async (c) => {
   } catch (error) {
     console.log(error);
     c.status(403);
-    return c.json({ error: "error while signing up" });
+    return c.json({ error: { message: "error while signing up" } });
   }
 });
 
