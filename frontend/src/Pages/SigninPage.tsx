@@ -10,7 +10,7 @@ import FormInput from "../components/UI/FormInput";
 import { signinInput } from "@ankit_waware/commen";
 import { ChangeEvent, useState } from "react";
 import { axiosInstance } from "../config";
-import axios, { Axios, AxiosError } from "axios";
+import axios from "axios";
 
 export default function SigninPage() {
   const [input, setInput] = useState<signinInput>({

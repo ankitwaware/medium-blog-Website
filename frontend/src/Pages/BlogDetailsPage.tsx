@@ -27,8 +27,24 @@ async function loader({ params }: LoaderFunctionArgs) {
   }
 }
 
+interface blogPost {
+  id: string;
+  title: string;
+  content: string;
+  published: string;
+  createdAt: string;
+  authorId: string;
+  author: {
+    name: string;
+  };
+}
+
+interface BlogDetailsPageLoader {
+  post: blogPost;
+}
+
 export default function BlogDetailsPage() {
-  const { post } = useLoaderData();
+  const { post } = useLoaderData() as BlogDetailsPageLoader;
 
   const date = new Date(post.createdAt);
   const dateArray = date.toUTCString().split(" ");
