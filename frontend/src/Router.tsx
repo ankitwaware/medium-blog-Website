@@ -1,29 +1,40 @@
 import { createBrowserRouter } from "react-router-dom";
-import BlogPage from "./Pages/BlogPage";
+import BlogsPage from "./Pages/BlogsPage";
 import SignupPage from "./Pages/SignupPage";
 import SigninPage from "./Pages/SigninPage";
+import RootLayout from "./components/RootLayout";
+import BlogDetailsPage from "./Pages/BlogDetailsPage";
+import PostBlogPage from "./Pages/PostBlogPage";
 
 const BrowserRouter = createBrowserRouter([
   {
     path: "/",
+    Component: RootLayout,
     children: [
       {
         index: true,
-        element: <BlogPage />,
+        loader: BlogsPage.loader,
+        element: <BlogsPage />,
       },
       {
-        path: "/signup",
+        path: "blog/:id",
+        loader: BlogDetailsPage.loader,
+        element: <BlogDetailsPage />,
+      },
+      {
+        path: "blog/publish",
+        action: PostBlogPage.action,
+        Component: PostBlogPage,
+      },
+      {
+        path: "signup",
         action: SignupPage.action,
         element: <SignupPage />,
       },
       {
-        path: "/signin",
+        path: "signin",
         action: SigninPage.action,
         element: <SigninPage />,
-      },
-      {
-        path: "/blogs",
-        element: <div>Blogs Page new</div>,
       },
     ],
   },

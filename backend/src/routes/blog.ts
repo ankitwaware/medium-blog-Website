@@ -43,7 +43,21 @@ blog.get("/all", async (c) => {
       datasourceUrl: c.env?.DATABASE_URL,
     }).$extends(withAccelerate());
 
-    const Allposts = await prisma.post.findMany({});
+    const Allposts = await prisma.post.findMany({
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        published: true,
+        createdAt: true,
+        authorId: true,
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
 
     if (!Allposts) {
       return c.json({
@@ -58,6 +72,50 @@ blog.get("/all", async (c) => {
     console.log(error);
     c.status(403);
     return c.json({ error: "error while geting all blog" });
+  }
+});
+
+blog.get("/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const userId = c.get("userId");
+
+    const prisma = new PrismaClient({
+      datasourceUrl: c.env?.DATABASE_URL,
+    }).$extends(withAccelerate());
+
+    const post = await prisma.post.findFirst({
+      where: {
+        id: id,
+        authorId: userId,
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        published: true,
+        createdAt: true,
+        authorId: true,
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!post) {
+      c.status(404);
+      return c.json({ error: "post not found" });
+    }
+
+    return c.json({
+      post,
+    });
+  } catch (error) {
+    console.log(error);
+    c.status(403);
+    return c.json({ error: "error while updating blog" });
   }
 });
 
@@ -83,6 +141,19 @@ blog.post("/", async (c) => {
         title: body.title,
         content: body.content,
         authorId: userId,
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        published: true,
+        createdAt: true,
+        authorId: true,
+        author: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
@@ -124,43 +195,25 @@ blog.put("/", async (c) => {
         title: body.title,
         content: body.content,
       },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        published: true,
+        createdAt: true,
+        authorId: true,
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     c.status(201);
     return c.json({
       message: "sucessfully updated blog",
       id: updatePost.id,
-    });
-  } catch (error) {
-    console.log(error);
-    c.status(403);
-    return c.json({ error: "error while updating blog" });
-  }
-});
-
-blog.get("/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    const userId = c.get("userId");
-
-    const prisma = new PrismaClient({
-      datasourceUrl: c.env?.DATABASE_URL,
-    }).$extends(withAccelerate());
-
-    const post = await prisma.post.findFirst({
-      where: {
-        id: id,
-        authorId: userId,
-      },
-    });
-
-    if (!post) {
-      c.status(404);
-      return c.json({ error: "post not found" });
-    }
-
-    return c.json({
-      post,
     });
   } catch (error) {
     console.log(error);

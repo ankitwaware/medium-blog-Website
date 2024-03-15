@@ -44,6 +44,10 @@ userRouter.post("/signup", async (c) => {
         password: body.password,
         name: body.username,
       },
+      select: {
+        id: true,
+        name: true,
+      },
     });
 
     const token = await sign(
@@ -53,7 +57,7 @@ userRouter.post("/signup", async (c) => {
       c.env.secret
     );
 
-    return c.json({ token });
+    return c.json({ token, username: newUser.name });
   } catch (error) {
     console.log(error);
     c.status(500);
@@ -80,6 +84,10 @@ userRouter.post("/signin", async (c) => {
         email: body.email,
         password: body.password,
       },
+      select: {
+        id: true,
+        name: true,
+      },
     });
 
     if (!user) {
@@ -98,6 +106,7 @@ userRouter.post("/signin", async (c) => {
 
     return c.json({
       token: token,
+      username: user.name,
     });
   } catch (error) {
     console.log(error);

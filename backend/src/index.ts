@@ -4,9 +4,9 @@ import mainRouter from "./routes/mainRouter";
 
 const app = new Hono();
 
-app.use("/api/*", cors());
+app.use("*", cors());
 
-app.get("/hello", (c) => {
+app.get("/", (c) => {
   return c.text("Hello Hono");
 });
 

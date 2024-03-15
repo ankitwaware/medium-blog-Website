@@ -1,25 +1,17 @@
-import {
-  ActionFunctionArgs,
-  Form,
-  Link,
-  redirect,
-  useActionData,
-} from "react-router-dom";
+import { ActionFunctionArgs, Form, Link, redirect } from "react-router-dom";
 import Quote from "../components/Quote";
 import FormInput from "../components/UI/FormInput";
 import { ChangeEvent, useState } from "react";
 import { signupInput } from "@ankit_waware/commen";
 import { axiosInstance } from "../config";
-import axios, { AxiosError, ResponseType } from "axios";
+import axios from "axios";
+
 export default function SignupPage() {
   const [input, setInput] = useState<signupInput>({
     username: "",
     email: "",
     password: "",
   });
-  const actionData = useActionData();
-
-  
 
   function onchangeHandler(event: ChangeEvent<HTMLInputElement>) {
     const name = event.target.name;
@@ -51,9 +43,6 @@ export default function SignupPage() {
               value={input.username}
               onChange={onchangeHandler}
               placeholder="Enter your username"
-              errorMsg={
-                actionData?.errors?.username && actionData.errors.username[0]
-              }
             />
             <FormInput
               id="email"
@@ -107,11 +96,11 @@ async function action({ request }: ActionFunctionArgs) {
       }
     );
 
-    console.log(response);
-
     if (response.status === 200) {
       localStorage.removeItem("authToken");
+      localStorage.removeItem("username");
       localStorage.setItem("authToken", response.data.token);
+      localStorage.setItem("username", response.data.username);
       return redirect("/blogs");
     }
   } catch (err) {

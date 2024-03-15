@@ -6,7 +6,8 @@ export const SignupInput = z.object({
       required_error: "Please Enter a valid Username",
       invalid_type_error: "Please Enter a valid Username",
     })
-    .trim(),
+    .trim()
+    .min(1, { message: "Please Enter a valid Username" }),
   email: z.string().trim().email({ message: "Please Enter a valid Email" }),
   password: z
     .string()
@@ -26,13 +27,15 @@ export const CreatePostInput = z.object({
       required_error: "required",
       invalid_type_error: "Please Enter a valid Username",
     })
-    .trim(),
+    .trim()
+    .min(1, { message: "Please Enter a valid title" }),
   content: z
     .string({
       required_error: "required",
       invalid_type_error: "Please Enter a valid Username",
     })
-    .trim(),
+    .trim()
+    .min(1, { message: "Please Enter a valid content" }),
 });
 export type createPostInput = z.infer<typeof CreatePostInput>;
 
@@ -40,9 +43,10 @@ export const UpdatePostInput = CreatePostInput.extend({
   id: z
     .string({
       required_error: "required",
-      invalid_type_error: "Please Enter a valid Username",
+      invalid_type_error: "Please Enter a valid blog id",
     })
-    .trim(),
+    .trim()
+    .min(1, { message: "Please Enter a valid blog id" }),
 });
 
 export type updatePostInput = z.infer<typeof UpdatePostInput>;
