@@ -103,7 +103,7 @@ async function action({ request }: ActionFunctionArgs) {
     if (response.status === 200) {
       localStorage.removeItem("authToken");
       localStorage.setItem("authToken", response.data.token);
-      return redirect("/blogs");
+      return redirect("/");
     }
 
     return response.data;

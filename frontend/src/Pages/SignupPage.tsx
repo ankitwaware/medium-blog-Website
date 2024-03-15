@@ -101,7 +101,7 @@ async function action({ request }: ActionFunctionArgs) {
       localStorage.removeItem("username");
       localStorage.setItem("authToken", response.data.token);
       localStorage.setItem("username", response.data.username);
-      return redirect("/blogs");
+      return redirect("/");
     }
   } catch (err) {
     if (axios.isAxiosError(err)) {

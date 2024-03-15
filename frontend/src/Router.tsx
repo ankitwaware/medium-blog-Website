@@ -14,12 +14,12 @@ const BrowserRouter = createBrowserRouter([
       {
         index: true,
         loader: BlogsPage.loader,
-        element: <BlogsPage />,
+        Component: BlogsPage,
       },
       {
         path: "blog/:id",
         loader: BlogDetailsPage.loader,
-        element: <BlogDetailsPage />,
+        Component: BlogDetailsPage,
       },
       {
         path: "blog/publish",
@@ -27,14 +27,14 @@ const BrowserRouter = createBrowserRouter([
         Component: PostBlogPage,
       },
       {
-        path: "signup",
+        path: "/signup",
         action: SignupPage.action,
-        element: <SignupPage />,
+        Component: SignupPage,
       },
       {
-        path: "signin",
+        path: "/signin",
         action: SigninPage.action,
-        element: <SigninPage />,
+        Component: SigninPage,
       },
     ],
   },
